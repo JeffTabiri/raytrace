@@ -1,45 +1,35 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#include <iostream>
-#include <vec3.h>
+#include "vec3.h"
+#include "interval.h"
+using color = vec3;
 
-class color {
-  public:
-    double e[3];
+inline double linear_to_gamma(double linear_component) {
+    if (linear_component > 0) {
+        return std::sqrt(linear_component);
+    }
+    return 0;
+}
 
-    color() : e {0,0,0} {};
-    color(double e0, double e1, double e2) : e {e0, e1, e2} {};
+void write_color(std::ostream& out, const color& pixel_color) {
+    auto r = pixel_color.x();
+    auto g = pixel_color.y();
+    auto b = pixel_color.z();
 
-    double x() const { return e[0];}
-    double y() const { return e[1];}
-    double z() const { return e[2];}
-    double length() const;
-};
-    
-std::ostream& operator<<(std::ostream& out, const color& v); 
+    // Apply a linear to gamma tranformation
+    r = linear_to_gamma(r);
+    g = linear_to_gamma(g);
+    b = linear_to_gamma(b);
 
-color operator+(const color& v1, const color& v2);
-color operator+(const color& v, const double c);
-color operator+(const double c, const color& v);
-color operator+(const vec3 v, const color& c);
-color operator+(const color& c, const vec3& v);
+    // Translate the [0,1] component values to the byte range [0,255].
+    static const interval intensity(0.000, 0.999);
+    int rbyte = int(256 * intensity.clamp(r));
+    int gbyte = int(256 * intensity.clamp(g));
+    int bbyte = int(256 * intensity.clamp(b));
 
-color operator-(const color& v1, const color& v2);
-color operator-(const color& v, const double c); 
-color operator-(const double c, const color& v);
-color operator-(const vec3 v, const color& c);
-color operator-(const color& c, const vec3& v);
- 
-color operator*(const color& v1, const color& v2);
-color operator*(const color& v, const double c);
-color operator*(const double c, const color& v);
-color operator*(const vec3 v, const color& c);
-color operator*(const color& c, const vec3& v);
-
-color operator/(const color& v, const double c);
-color operator/(const double& c, const color& v);
-
-void write_color(std::ostream& out, const color& v); 
+    // Write out the pixel color components.
+    out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
+}
 
 #endif 

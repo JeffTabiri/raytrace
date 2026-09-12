@@ -2,15 +2,26 @@
     "version": 8,
     "configurePresets": [
         {
-            "name": "jeff",
-            "displayName": "GCC 16.1.0 aarch64-apple-darwin25",
-            "description": "Using compilers: C = /opt/homebrew/bin/aarch64-apple-darwin25-gcc-16, CXX = /opt/homebrew/bin/aarch64-apple-darwin25-g++-16",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "name": "Debug",
+            "displayName": "Clang 16.0.0 arm64-apple-darwin24.5.0",
+            "description": "Using compilers: C = /usr/bin/clang, CXX = /usr/bin/clang++",
+            "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-                "CMAKE_C_COMPILER": "/opt/homebrew/bin/aarch64-apple-darwin25-gcc-16",
-                "CMAKE_CXX_COMPILER": "/opt/homebrew/bin/aarch64-apple-darwin25-g++-16",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install/${presetName}",
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
                 "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "Debug",
+            "displayName": "Custom configure preset",
+            "description": "Sets Ninja generator, build and install directory",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install/${presetName}"
             }
         }
     ]

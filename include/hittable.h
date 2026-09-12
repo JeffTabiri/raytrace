@@ -1,19 +1,19 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-#include "ray.h"
 #include "vec3.h"
 
-#include <memory.h>
-#include <memory>
-#include <vector>
+class material;
 
 class hit_record {
   public:
     point3 p; 
     vec3 normal;
     double t;
+    shared_ptr<material> mat;
     bool front_face;
+    bool hit_anything;
+    float closest_so_far;
 
     void set_face_normal(const ray& r, const vec3& outward_normal) {
       front_face = dot(r.direction(), outward_normal) < 0;
@@ -24,43 +24,11 @@ class hit_record {
 class hittable {
   public:
     virtual ~hittable() = default;
-
-    virtual bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const = 0;
+    virtual bool hit(const ray& r, interval ray_t, hit_record& rec) = 0;
+    virtual point3 get_center() = 0;
+    virtual point3 get_min() = 0;
+    virtual point3 get_max() = 0;
 };
 
-class hittable_list : public hittable {
-  public:
-    std::vector<std::shared_ptr<hittable>> objects;
-
-    hittable_list() {};
-
-    hittable_list(std::shared_ptr<hittable> object) {
-      add(object);
-    }
-
-    void clear() { objects.clear(); }
-
-    void add(std::shared_ptr<hittable> object) {
-      objects.push_back(object);
-    }
-
-    bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override {
-      hit_record temp_rec;
-      bool hit_anything = false;
-      auto closest_so_far = ray_tmax;
-
-      for (const auto& object : objects) {
-        if (object->hit(r, ray_tmin, closest_so_far, temp_rec)) {
-          hit_anything = true;
-          closest_so_far = temp_rec.t;
-          rec = temp_rec;
-        }
-      }
-
-      return hit_anything;
-    }
-};
-
-#endif // !HITTABLE_H
-#define HITTABLE_H
+#endif
 
